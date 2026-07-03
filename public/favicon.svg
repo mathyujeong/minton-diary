@@ -6,7 +6,7 @@
       <stop offset="100%" stop-color="#005e30" />
     </linearGradient>
 
-    <!-- Athletic Drop Shadow for MD Typography -->
+    <!-- Athletic Drop Shadow for MD Typography & Shuttlecock Dot -->
     <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
       <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#002410" flood-opacity="0.6" />
     </filter>
@@ -41,6 +41,13 @@
     <text x="210" y="315" font-family="'Anton', 'Bebas Neue', 'Impact', 'Arial Black', sans-serif" font-size="260" font-weight="900" fill="#ffffff" text-anchor="middle" letter-spacing="-6">MD</text>
   </g>
 
-  <!-- 4. Yonex Yellow / Shuttlecock Accent Dot -->
-  <circle cx="365" cy="145" r="28" fill="#ffdf00" filter="url(#shadow)" />
+  <!-- 4. Yonex Yellow Shuttlecock 'IN' Winning Shot right on the end line / side line! -->
+  <g filter="url(#shadow)">
+    <!-- Impact ripple ring representing line smash IN! -->
+    <circle cx="450" cy="270" r="42" fill="none" stroke="#ffdf00" stroke-width="5" opacity="0.85" />
+    <!-- Yellow shuttlecock cork hitting right on line x=450 -->
+    <circle cx="450" cy="270" r="28" fill="#ffdf00" />
+    <!-- Crisp white impact core -->
+    <circle cx="450" cy="270" r="8" fill="#ffffff" />
+  </g>
 </svg>
