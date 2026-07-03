@@ -180,22 +180,21 @@ const TOURNAMENTS_FEED = [
 ];
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState("diary"); // "diary" | "tournaments" | "scouting" | "profile"
+  const [activeTab, setActiveTab] = useState("diary");
   const [matches, setMatches] = useState(INITIAL_MATCHES);
-  const [myProfile, setMyProfile] = useState(FEDERATION_PLAYERS_DB[0]); // Default to 유정 (광양시 / 테크존클럽)
+  const [myProfile, setMyProfile] = useState(FEDERATION_PLAYERS_DB[0]);
   const [selectedOpponent, setSelectedOpponent] = useState(null);
-  const [isEditingMemo, setIsEditingMemo] = useState(null); // match id
+  const [isEditingMemo, setIsEditingMemo] = useState(null);
   const [memoText, setMemoText] = useState("");
   const [videoText, setVideoText] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [isSyncing, setIsSyncing] = useState(false);
-  const [filterResult, setFilterResult] = useState("ALL"); // ALL | WIN | LOSS | UPCOMING
+  const [filterResult, setFilterResult] = useState("ALL");
   
   // Player Search Modal State
   const [isSearchingPlayer, setIsSearchingPlayer] = useState(false);
   const [playerSearchKeyword, setPlayerSearchKeyword] = useState("테크존");
 
-  // Simulate auto sync from BKPLAY / Netsystem
   const handleTriggerSync = () => {
     setIsSyncing(true);
     setTimeout(() => {
@@ -241,46 +240,47 @@ export default function App() {
   });
 
   return (
-    <div className="min-h-screen bg-white text-[#111111] flex flex-col font-sans">
+    <div className="app-container">
       
-      {/* 1. TOP UTILITY BAR (Nike Style) */}
-      <div className="bg-[#f5f5f5] px-6 py-2.5 border-b border-[#e5e5e5] flex flex-wrap justify-between items-center text-xs text-[#707072] font-medium gap-2">
-        <div className="flex items-center gap-2">
+      {/* 1. TOP UTILITY BAR */}
+      <div className="top-utility-bar">
+        <div className="top-bar-left">
           <span className="live-dot"></span>
-          <span className="font-semibold text-[#111111]">연동 클럽: {myProfile.club} | 선수명: {myProfile.name}</span>
-          <span className="bg-[#111111] text-white px-2 py-0.5 rounded-full text-[10px]">공식 DB 연동중</span>
+          <span>연동 클럽: <strong>{myProfile.club}</strong> | 선수명: <strong>{myProfile.name}</strong></span>
+          <span className="badge-dark" style={{ fontSize: '10px', padding: '2px 8px' }}>공식 DB 연동중</span>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="top-bar-right">
           <button 
             onClick={() => { setIsSearchingPlayer(true); setPlayerSearchKeyword("테크존"); }}
-            className="bg-[#d30005] text-white font-bold px-3 py-1 rounded-full text-[11px] hover:bg-[#780700] transition-colors flex items-center gap-1 shadow-sm"
+            className="btn-sale"
+            style={{ padding: '6px 14px', fontSize: '12px' }}
           >
             <SearchCode size={13} /> 내 클럽/선수 변경 및 검색
           </button>
-          <button onClick={handleTriggerSync} className="hover:text-[#111111] flex items-center gap-1 transition-colors font-semibold">
+          <button onClick={handleTriggerSync} className="btn-secondary" style={{ padding: '6px 12px', fontSize: '12px', border: 'none', background: 'transparent' }}>
             <RefreshCw size={12} className={isSyncing ? "animate-spin text-[#007d48]" : ""} />
             <span>{isSyncing ? "데이터 불러오는 중..." : "동기화 갱신"}</span>
           </button>
-          <span className="hidden sm:inline">DB: SUPABASE CLOUD</span>
+          <span>DB: SUPABASE CLOUD</span>
         </div>
       </div>
 
       {/* 2. PRIMARY NAV BAR */}
-      <header className="border-b border-[#cacacb] px-6 py-4 flex flex-wrap justify-between items-center bg-white sticky top-0 z-40">
-        <div className="flex items-center gap-3">
-          <div className="bg-[#111111] text-white w-10 h-10 rounded-full flex items-center justify-center font-black text-xl tracking-tighter">
+      <header className="app-header">
+        <div className="header-brand">
+          <div className="brand-logo-box">
             MD
           </div>
           <div>
-            <h1 className="font-display-md tracking-tight leading-none text-2xl font-black">
-              민턴일기장 <span className="text-xs font-sans font-normal text-[#707072] ml-1">MINTON DIARY</span>
+            <h1 className="brand-title">
+              민턴일기장 <span style={{ fontSize: '12px', fontFamily: 'Inter, sans-serif', fontWeight: 500, color: '#707072', marginLeft: '6px' }}>MINTON DIARY</span>
             </h1>
-            <p className="text-[11px] text-[#707072] tracking-wider font-semibold uppercase">Nike Athletic Editorial UI</p>
+            <p className="brand-subtitle">Nike Athletic Editorial UI</p>
           </div>
         </div>
 
         {/* Navigation Tabs */}
-        <nav className="flex items-center gap-2 my-2 sm:my-0 flex-wrap">
+        <nav className="nav-tabs">
           {[
             { id: "diary", label: "내 경기 다이어리", icon: FileText, count: matches.length },
             { id: "tournaments", label: "대회 일정 연동 피드", icon: Calendar, count: TOURNAMENTS_FEED.length },
@@ -298,7 +298,7 @@ export default function App() {
                 <Icon size={14} />
                 <span>{tab.label}</span>
                 {tab.count !== undefined && (
-                  <span className={`text-[11px] px-1.5 py-0.5 rounded-full ${isActive ? 'bg-white text-[#111111]' : 'bg-[#e5e5e5] text-[#111111]'}`}>
+                  <span className="pill-count">
                     {tab.count}
                   </span>
                 )}
@@ -308,93 +308,88 @@ export default function App() {
         </nav>
 
         {/* Search Pill */}
-        <div className="search-pill-container w-full sm:w-60">
-          <Search size={16} className="text-[#707072] ml-1" />
+        <div className="search-pill-box">
+          <Search size={16} color="#707072" style={{ marginLeft: '4px', marginRight: '4px' }} />
           <input 
             type="text" 
             placeholder="선수, 대회, 클럽 검색..." 
-            className="search-pill-input"
+            className="search-input"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
           {searchQuery && (
-            <button onClick={() => setSearchQuery("")} className="text-[#707072] hover:text-[#111111]">
+            <button onClick={() => setSearchQuery("")} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#707072' }}>
               <X size={14} />
             </button>
           )}
         </div>
       </header>
 
-      {/* 3. HERO ATHLETIC BILLBOARD (Nike Campaign Style) */}
-      <section className="bg-[#111111] text-white px-6 py-12 border-b border-[#cacacb] relative overflow-hidden">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-end gap-8 relative z-10">
+      {/* 3. HERO ATHLETIC BILLBOARD */}
+      <section className="hero-section">
+        <div className="hero-content">
           <div>
-            <div className="flex flex-wrap items-center gap-2 mb-3">
-              <span className="bg-[#d30005] text-white text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+            <div className="hero-tags">
+              <span className="badge-red">
                 PRO ATHLETE DASHBOARD
               </span>
-              <span className="text-white bg-[#39393b] text-xs font-bold px-3 py-1 rounded-full">
+              <span className="badge-dark">
                 {myProfile.club}
               </span>
               <button 
                 onClick={() => { setIsSearchingPlayer(true); setPlayerSearchKeyword("테크존"); }}
-                className="text-xs text-[#f5f5f5] underline font-semibold hover:text-white"
+                style={{ background: 'none', border: 'none', color: '#f5f5f5', fontSize: '12px', textDecoration: 'underline', cursor: 'pointer', fontWeight: 600 }}
               >
                 (클럽/선수 변경)
               </button>
             </div>
-            <h2 className="font-display-hero text-6xl md:text-8xl tracking-tight leading-none">
+            <h2 className="font-display-hero">
               {myProfile.name}'S <br />
-              <span className="text-[#f5f5f5] opacity-90">BATTLE RECORD</span>
+              <span style={{ color: '#f5f5f5', opacity: 0.9 }}>BATTLE RECORD</span>
             </h2>
           </div>
 
-          <div className="grid grid-cols-3 gap-6 bg-[#222222] p-6 rounded-none w-full md:w-auto border border-[#39393b]">
-            <div>
-              <p className="text-[#9e9ea0] text-xs font-semibold uppercase">Win Rate</p>
-              <p className="font-display-lg text-4xl text-[#1eaa52] mt-1">{myProfile.winRate}</p>
+          <div className="hero-stats-grid">
+            <div className="stat-item">
+              <p className="stat-label">Win Rate</p>
+              <p className="stat-val-green">{myProfile.winRate}</p>
             </div>
-            <div className="border-l border-[#39393b] pl-6">
-              <p className="text-[#9e9ea0] text-xs font-semibold uppercase">Tourneys</p>
-              <p className="font-display-lg text-4xl text-white mt-1">{myProfile.tourneysPlayed}</p>
+            <div className="stat-item">
+              <p className="stat-label">Tourneys</p>
+              <p className="stat-val-white">{myProfile.tourneysPlayed}</p>
             </div>
-            <div className="border-l border-[#39393b] pl-6">
-              <p className="text-[#9e9ea0] text-xs font-semibold uppercase">Trophies</p>
-              <p className="font-display-lg text-4xl text-[#fdf2e1] mt-1">{myProfile.trophies} 🏆</p>
+            <div className="stat-item">
+              <p className="stat-label">Trophies</p>
+              <p className="stat-val-gold">{myProfile.trophies} 🏆</p>
             </div>
           </div>
         </div>
-        {/* Subtle decorative background text */}
-        <div className="absolute -right-10 -bottom-10 font-display-hero text-[180px] text-white opacity-[0.03] select-none pointer-events-none">
+        <div className="hero-bg-text">
           TECHZONE
         </div>
       </section>
 
       {/* 4. MAIN CONTENT WORKSPACE */}
-      <main className="max-w-6xl mx-auto w-full p-6 flex-1">
+      <main className="main-workspace">
         
-        {/* TAB 1: MATCH DIARY (내 경기 다이어리) */}
+        {/* TAB 1: MATCH DIARY */}
         {activeTab === "diary" && !selectedOpponent && (
-          <div className="space-y-8">
-            <div className="flex flex-wrap justify-between items-center gap-4">
+          <div>
+            <div className="section-header-row">
               <div>
-                <h3 className="font-display-md text-3xl">RECENT & UPCOMING MATCHES</h3>
-                <p className="text-sm text-[#707072]">
+                <h3 className="font-display-md" style={{ fontSize: '28px', color: '#111111' }}>RECENT & UPCOMING MATCHES</h3>
+                <p className="section-desc">
                   <strong>[{myProfile.club}]</strong> 소속 <strong>{myProfile.name}</strong> 선수의 공식 출전 일정과 실전 전술 일지입니다.
                 </p>
               </div>
 
               {/* Result Filter Chips */}
-              <div className="flex gap-2 flex-wrap">
+              <div className="filter-group">
                 {["ALL", "WIN", "LOSS", "UPCOMING"].map(f => (
                   <button
                     key={f}
                     onClick={() => setFilterResult(f)}
-                    className={`text-xs font-bold px-4 py-2 rounded-full transition-all ${
-                      filterResult === f 
-                        ? 'bg-[#111111] text-white shadow-sm' 
-                        : 'bg-[#f5f5f5] text-[#707072] hover:bg-[#e5e5e5]'
-                    }`}
+                    className={`filter-btn ${filterResult === f ? 'active' : ''}`}
                   >
                     {f === "ALL" ? "전체 보기" : f === "WIN" ? "승리 🔥" : f === "LOSS" ? "패배 💧" : "출전 예정 📌"}
                   </button>
@@ -403,50 +398,48 @@ export default function App() {
             </div>
 
             {/* Match Cards List */}
-            <div className="space-y-4">
+            <div className="match-cards-list">
               {filteredMatches.map(match => {
                 const isWin = match.result === "WIN";
                 const isLoss = match.result === "LOSS";
                 const isUpcoming = match.result === "UPCOMING";
 
                 return (
-                  <div key={match.id} className="nike-card-stage border border-[#e5e5e5] hover:border-[#111111] transition-all">
-                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                  <div key={match.id} className="match-card">
+                    <div className="match-card-main">
                       
                       {/* Left: Tournament & Match Info */}
-                      <div className="space-y-2 flex-1">
-                        <div className="flex items-center gap-3">
-                          <span className={`text-[11px] font-black px-2.5 py-1 rounded-full uppercase ${
-                            isWin ? 'bg-[#d30005] text-white' : isLoss ? 'bg-[#39393b] text-white' : 'bg-[#0a7281] text-white'
-                          }`}>
+                      <div className="match-info">
+                        <div className="match-tags">
+                          <span className={isWin ? "badge-win" : isLoss ? "badge-loss" : "badge-upcoming"}>
                             {isWin ? "WIN 🔥" : isLoss ? "LOSS 💧" : "D-DAY UPCOMING 📌"}
                           </span>
-                          <span className="text-xs font-semibold text-[#707072] flex items-center gap-1">
+                          <span className="match-meta-text">
                             <Calendar size={13} /> {match.date} | {match.location}
                           </span>
                         </div>
-                        <h4 className="font-bold text-xl text-[#111111]">{match.tournament}</h4>
-                        <p className="text-sm font-semibold text-[#4b4b4d] bg-white inline-block px-3 py-1 rounded-md border border-[#e5e5e5]">
+                        <h4 className="match-title">{match.tournament}</h4>
+                        <p className="match-event-pill">
                           종목: {match.event}
                         </p>
                       </div>
 
                       {/* Center: Team vs Opponent Score */}
-                      <div className="bg-white p-4 rounded-xl border border-[#cacacb] flex items-center gap-6 text-center min-w-[280px] justify-between">
-                        <div className="text-left">
-                          <p className="text-[11px] text-[#707072] font-semibold">MY TEAM</p>
-                          <p className="font-bold text-sm text-[#111111]">{match.myTeam}</p>
+                      <div className="score-box">
+                        <div className="score-team">
+                          <p className="score-label">MY TEAM</p>
+                          <p className="score-name">{match.myTeam}</p>
                         </div>
                         
-                        <div className="bg-[#111111] text-white px-3 py-1.5 rounded-lg font-display-md text-xl tracking-wider">
+                        <div className="score-display">
                           {match.score}
                         </div>
 
-                        <div className="text-right">
-                          <p className="text-[11px] text-[#707072] font-semibold">OPPONENT</p>
+                        <div className="score-opp">
+                          <p className="score-label">OPPONENT</p>
                           <button 
                             onClick={() => setSelectedOpponent(OPPONENT_DATABASE[match.opponentId])}
-                            className="font-bold text-sm text-[#d30005] hover:underline flex items-center justify-end gap-1"
+                            className="score-opp-btn"
                           >
                             <span>{match.opponentTeam}</span>
                             <ChevronRight size={14} />
@@ -455,19 +448,19 @@ export default function App() {
                       </div>
 
                       {/* Right: Actions */}
-                      <div className="flex md:flex-col gap-2 w-full md:w-auto">
+                      <div className="match-actions">
                         <button 
                           onClick={() => openMemoModal(match)}
-                          className="btn-primary flex-1 md:flex-none justify-center text-xs py-3"
+                          className="btn-primary"
                         >
                           <Edit3 size={14} />
                           <span>{match.hasMemo ? "비밀 일지 수정" : "+ 실전 메모 추가"}</span>
                         </button>
                         <button 
                           onClick={() => setSelectedOpponent(OPPONENT_DATABASE[match.opponentId])}
-                          className="btn-secondary flex-1 md:flex-none justify-center text-xs py-3 bg-white border border-[#cacacb]"
+                          className="btn-secondary"
                         >
-                          <ShieldAlert size={14} className="text-[#d30005]" />
+                          <ShieldAlert size={14} color="#d30005" />
                           <span>상대 스카우팅</span>
                         </button>
                       </div>
@@ -475,10 +468,10 @@ export default function App() {
 
                     {/* Secret Tactical Note Display */}
                     {match.memo && (
-                      <div className="mt-6 pt-6 border-t border-[#cacacb] bg-white p-4 rounded-xl border-l-4 border-l-[#111111]">
-                        <div className="flex justify-between items-start">
-                          <div className="flex items-center gap-2 mb-1 text-xs font-bold text-[#111111] uppercase tracking-wider">
-                            <Sparkles size={14} className="text-[#d30005]" />
+                      <div className="tactical-note-box">
+                        <div className="tactical-note-header">
+                          <div className="tactical-title">
+                            <Sparkles size={14} color="#d30005" />
                             <span>MY TACTICAL DIARY & FEEDBACK</span>
                           </div>
                           {match.videoUrl && (
@@ -486,13 +479,13 @@ export default function App() {
                               href={match.videoUrl} 
                               target="_blank" 
                               rel="noreferrer"
-                              className="text-xs text-[#0a7281] font-bold hover:underline flex items-center gap-1"
+                              className="tactical-video-link"
                             >
                               <Video size={13} /> 경기 녹화 유튜브 보기
                             </a>
                           )}
                         </div>
-                        <p className="text-sm text-[#39393b] mt-1 font-medium leading-relaxed">
+                        <p className="tactical-content">
                           "{match.memo}"
                         </p>
                       </div>
@@ -504,44 +497,45 @@ export default function App() {
           </div>
         )}
 
-        {/* TAB 2: TOURNAMENTS FEED (대회 일정 연동) */}
+        {/* TAB 2: TOURNAMENTS FEED */}
         {activeTab === "tournaments" && !selectedOpponent && (
-          <div className="space-y-8">
-            <div>
-              <h3 className="font-display-md text-3xl">NATIONAL TOURNAMENTS FEED</h3>
-              <p className="text-sm text-[#707072]">넷시스템 및 BKPLAY에서 실시간 수집되는 전국 동호인 배드민턴 일정입니다. 출전 버튼을 눌러 일기장에 연동하세요.</p>
+          <div>
+            <div className="section-header-row">
+              <div>
+                <h3 className="font-display-md" style={{ fontSize: '28px', color: '#111111' }}>NATIONAL TOURNAMENTS FEED</h3>
+                <p className="section-desc">넷시스템 및 BKPLAY에서 실시간 수집되는 전국 동호인 배드민턴 일정입니다. 출전 버튼을 눌러 일기장에 연동하세요.</p>
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid-2col">
               {TOURNAMENTS_FEED.map(t => (
-                <div key={t.id} className="nike-card-stage border border-[#cacacb] flex flex-col justify-between">
+                <div key={t.id} className="feed-card">
                   <div>
-                    <div className="flex justify-between items-center mb-3">
-                      <span className="text-xs font-bold px-3 py-1 bg-[#111111] text-white rounded-full">
+                    <div className="feed-header">
+                      <span className="dday-badge">
                         {t.dDay}
                       </span>
-                      <span className={`text-xs font-bold px-3 py-1 rounded-full ${
-                        t.status === '접수중' ? 'bg-[#d30005] text-white' : 'bg-white text-[#707072] border border-[#cacacb]'
-                      }`}>
+                      <span className={t.status === '접수중' ? 'status-badge-red' : 'status-badge-white'}>
                         {t.status}
                       </span>
                     </div>
-                    <h4 className="font-bold text-xl mb-2">{t.name}</h4>
-                    <p className="text-sm text-[#707072] flex items-center gap-1.5 mb-1">
+                    <h4 className="feed-title">{t.name}</h4>
+                    <p className="feed-meta">
                       <Calendar size={14} /> 기간: {t.date}
                     </p>
-                    <p className="text-sm text-[#707072] flex items-center gap-1.5">
+                    <p className="feed-meta">
                       <MapPin size={14} /> 장소: {t.location}
                     </p>
                   </div>
 
-                  <div className="mt-6 pt-4 border-t border-[#cacacb] flex gap-3">
+                  <div className="feed-actions">
                     <button 
                       onClick={() => {
                         alert(`📌 [${t.name}] 일정을 내 경기 다이어리에 추가했습니다!\n대진표가 발표되면 자동으로 코트 번호와 상대방을 긁어옵니다.`);
                         setActiveTab("diary");
                       }} 
-                      className="btn-primary flex-1 text-xs py-2.5 justify-center"
+                      className="btn-primary"
+                      style={{ flex: 1 }}
                     >
                       <Plus size={14} /> 내 일기장에 연동하기
                     </button>
@@ -549,7 +543,8 @@ export default function App() {
                       href="https://netsystem.co.kr:8081/" 
                       target="_blank" 
                       rel="noreferrer"
-                      className="btn-secondary text-xs py-2.5 px-4 bg-white border border-[#cacacb]"
+                      className="btn-secondary"
+                      style={{ textDecoration: 'none' }}
                     >
                       요강 확인 <ExternalLink size={12} />
                     </a>
@@ -560,39 +555,41 @@ export default function App() {
           </div>
         )}
 
-        {/* TAB 3: SCOUTING DIRECTORY (상대 스카우팅 리포트) */}
+        {/* TAB 3: SCOUTING DIRECTORY */}
         {activeTab === "scouting" && !selectedOpponent && (
-          <div className="space-y-8">
-            <div>
-              <h3 className="font-display-md text-3xl">OPPONENT SCOUTING DATABASE</h3>
-              <p className="text-sm text-[#707072]">과거 대결했던 상대방들의 플레이 스타일과 내 비밀 약점 분석 노트를 확인하세요.</p>
+          <div>
+            <div className="section-header-row">
+              <div>
+                <h3 className="font-display-md" style={{ fontSize: '28px', color: '#111111' }}>OPPONENT SCOUTING DATABASE</h3>
+                <p className="section-desc">과거 대결했던 상대방들의 플레이 스타일과 내 비밀 약점 분석 노트를 확인하세요.</p>
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid-3col">
               {Object.entries(OPPONENT_DATABASE).map(([id, opp]) => (
                 <div 
                   key={id} 
                   onClick={() => setSelectedOpponent(opp)}
-                  className="nike-card-stage border border-[#cacacb] hover:border-[#111111] cursor-pointer transition-all group"
+                  className="scout-card"
                 >
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="w-12 h-12 bg-[#111111] text-white rounded-full flex items-center justify-center font-bold text-lg">
+                  <div className="scout-top">
+                    <div className="scout-avatar">
                       {opp.name[0]}
                     </div>
-                    <span className="text-xs font-bold text-[#d30005] bg-white px-2.5 py-1 rounded-full border border-[#e5e5e5]">
+                    <span className="scout-winrate">
                       WIN RATE {opp.winRate}
                     </span>
                   </div>
 
-                  <h4 className="font-bold text-xl group-hover:text-[#d30005] transition-colors flex items-center justify-between">
+                  <h4 className="scout-name-row">
                     <span>{opp.name} 선수의 카드</span>
                     <ChevronRight size={18} />
                   </h4>
-                  <p className="text-xs text-[#707072] font-semibold mt-1">{opp.club} | {opp.grade}</p>
+                  <p className="scout-sub">{opp.club} | {opp.grade}</p>
 
-                  <div className="mt-4 pt-4 border-t border-[#cacacb] space-y-2">
-                    <p className="text-xs font-bold text-[#111111]">⚡ 플레이 스타일: {opp.playStyle}</p>
-                    <p className="text-xs text-[#707072] line-clamp-2">" {opp.scoutingNote.replace("🚨 비밀 스카우팅 노트: ", "")} "</p>
+                  <div className="scout-body">
+                    <p className="scout-style">⚡ 플레이 스타일: {opp.playStyle}</p>
+                    <p className="scout-note-preview">" {opp.scoutingNote.replace("🚨 비밀 스카우팅 노트: ", "")} "</p>
                   </div>
                 </div>
               ))}
@@ -600,108 +597,110 @@ export default function App() {
           </div>
         )}
 
-        {/* TAB 4: PROFILE & CLUB SETTINGS (내 클럽 & 프로필 설정) */}
+        {/* TAB 4: PROFILE & CLUB SETTINGS */}
         {activeTab === "profile" && !selectedOpponent && (
-          <div className="max-w-3xl mx-auto space-y-8 bg-[#f5f5f5] p-8 rounded-none border border-[#cacacb]">
-            <div className="flex justify-between items-start flex-wrap gap-4">
+          <div className="profile-panel">
+            <div className="section-header-row">
               <div>
-                <h3 className="font-display-md text-3xl">MY CLUB & PLAYER LINKING</h3>
-                <p className="text-sm text-[#707072]">내가 소속된 클럽과 이름을 공식 배드민턴 연합회 DB에서 검색하여 직접 연동할 수 있습니다.</p>
+                <h3 className="font-display-md" style={{ fontSize: '28px', color: '#111111' }}>MY CLUB & PLAYER LINKING</h3>
+                <p className="section-desc">내가 소속된 클럽과 이름을 공식 배드민턴 연합회 DB에서 검색하여 직접 연동할 수 있습니다.</p>
               </div>
               <button 
                 onClick={() => { setIsSearchingPlayer(true); setPlayerSearchKeyword("테크존"); }}
-                className="btn-sale text-xs py-2.5 px-5"
+                className="btn-sale"
               >
                 <SearchCode size={15} /> 🔍 선수 / 클럽 검색해서 연동 변경하기
               </button>
             </div>
 
-            <div className="space-y-4 bg-white p-6 rounded-xl border border-[#cacacb]">
-              <div className="flex items-center gap-3 border-b border-[#e5e5e5] pb-4">
-                <div className="w-12 h-12 bg-[#111111] text-white rounded-full flex items-center justify-center font-black text-xl">
+            <div className="profile-form-box">
+              <div className="profile-active-player">
+                <div className="brand-logo-box" style={{ width: '56px', height: '56px', fontSize: '24px' }}>
                   {myProfile.name[0]}
                 </div>
                 <div>
-                  <span className="text-[11px] font-bold bg-[#007d48] text-white px-2 py-0.5 rounded-full">
+                  <span style={{ fontSize: '11px', fontWeight: 800, backgroundColor: '#007d48', color: '#ffffff', padding: '4px 10px', borderRadius: '9999px' }}>
                     현재 연결된 공식 선수
                   </span>
-                  <h4 className="font-bold text-2xl text-[#111111] mt-1">{myProfile.name} 님</h4>
-                  <p className="text-sm text-[#707072] font-semibold">{myProfile.club}</p>
+                  <h4 style={{ fontSize: '24px', fontWeight: 800, color: '#111111', marginTop: '6px' }}>{myProfile.name} 님</h4>
+                  <p style={{ fontSize: '14px', color: '#707072', fontWeight: 600 }}>{myProfile.club}</p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="form-grid-2">
                 <div>
-                  <label className="text-xs font-bold text-[#707072] block mb-1">선수 이름</label>
+                  <label className="form-label">선수 이름</label>
                   <input 
                     type="text" 
                     value={myProfile.name} 
                     onChange={(e) => setMyProfile({ ...myProfile, name: e.target.value })}
-                    className="w-full p-3 border border-[#cacacb] rounded-lg font-bold text-[#111111] focus:outline-none focus:border-[#111111]"
+                    className="form-input"
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-[#707072] block mb-1">소속 클럽 / 지역</label>
+                  <label className="form-label">소속 클럽 / 지역</label>
                   <input 
                     type="text" 
                     value={myProfile.club} 
                     onChange={(e) => setMyProfile({ ...myProfile, club: e.target.value })}
-                    className="w-full p-3 border border-[#cacacb] rounded-lg font-bold text-[#111111] focus:outline-none focus:border-[#111111]"
+                    className="form-input"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-4">
+              <div className="form-grid-3">
                 <div>
-                  <label className="text-xs font-bold text-[#707072] block mb-1">출생년도</label>
+                  <label className="form-label">출생년도</label>
                   <input 
                     type="text" 
                     value={myProfile.birthYear} 
                     onChange={(e) => setMyProfile({ ...myProfile, birthYear: e.target.value })}
-                    className="w-full p-3 border border-[#cacacb] rounded-lg font-bold text-[#111111]"
+                    className="form-input"
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-[#707072] block mb-1">주 급수 (Grade 1)</label>
+                  <label className="form-label">주 급수 (Grade 1)</label>
                   <input 
                     type="text" 
                     value={myProfile.grade1} 
                     onChange={(e) => setMyProfile({ ...myProfile, grade1: e.target.value })}
-                    className="w-full p-3 border border-[#cacacb] rounded-lg font-bold text-[#111111]"
+                    className="form-input"
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-[#707072] block mb-1">세부 급수 (Grade 2)</label>
+                  <label className="form-label">세부 급수 (Grade 2)</label>
                   <input 
                     type="text" 
                     value={myProfile.grade2} 
                     onChange={(e) => setMyProfile({ ...myProfile, grade2: e.target.value })}
-                    className="w-full p-3 border border-[#cacacb] rounded-lg font-bold text-[#111111]"
+                    className="form-input"
                   />
                 </div>
               </div>
 
-              <div className="pt-4 flex gap-4">
+              <div className="form-actions">
                 <button 
                   onClick={() => { setIsSearchingPlayer(true); setPlayerSearchKeyword("테크존"); }}
-                  className="btn-secondary flex-1 justify-center py-3 border border-[#cacacb]"
+                  className="btn-secondary"
+                  style={{ flex: 1 }}
                 >
                   <SearchCode size={16} /> 공식 선수 DB 다시 검색하기
                 </button>
                 <button 
                   onClick={handleTriggerSync}
-                  className="btn-primary flex-1 justify-center py-3"
+                  className="btn-primary"
+                  style={{ flex: 1 }}
                 >
                   <RefreshCw size={16} /> 변경된 소속 데이터 동기화
                 </button>
               </div>
             </div>
 
-            <div className="bg-[#111111] text-white p-6 rounded-xl space-y-2">
-              <h4 className="font-bold text-lg flex items-center gap-2">
-                <CheckCircle2 className="text-[#1eaa52]" /> Supabase 클라우드 데이터베이스 연결 상태
+            <div className="cloud-status-box">
+              <h4 className="cloud-title">
+                <CheckCircle2 color="#1eaa52" size={20} /> Supabase 클라우드 데이터베이스 연결 상태
               </h4>
-              <p className="text-xs text-[#9e9ea0]">
+              <p className="cloud-text">
                 계정 연동 완료: `techzone@minton-diary.supabase.co` <br />
                 <strong>[광양시 테크존클럽]</strong> 소속 경기 데이터 및 비밀 전술 일지가 실시간으로 영구 백업되고 있습니다.
               </p>
@@ -709,60 +708,61 @@ export default function App() {
           </div>
         )}
 
-        {/* 5. OPPONENT DETAILED SCOUTING VIEW (상대 선수 클릭 시 화면) */}
+        {/* 5. OPPONENT DETAILED SCOUTING VIEW */}
         {selectedOpponent && (
-          <div className="bg-[#f5f5f5] p-8 border border-[#111111] space-y-6 relative animate-fadeIn">
+          <div className="opponent-detail-panel">
             <button 
               onClick={() => setSelectedOpponent(null)}
-              className="absolute top-6 right-6 btn-icon-circle bg-white border border-[#cacacb]"
+              className="btn-icon-circle"
+              style={{ position: 'absolute', top: '24px', right: '24px', background: '#ffffff' }}
             >
               <X size={20} />
             </button>
 
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 bg-[#d30005] text-white rounded-full flex items-center justify-center font-black text-2xl">
+            <div className="opponent-header-row">
+              <div className="opponent-avatar-lg">
                 {selectedOpponent.name[0]}
               </div>
               <div>
-                <span className="bg-[#111111] text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase">
+                <span className="badge-dark" style={{ fontSize: '11px' }}>
                   OPPONENT SCOUTING REPORT
                 </span>
-                <h3 className="font-display-md text-4xl mt-1">{selectedOpponent.name} 선수</h3>
-                <p className="text-sm font-semibold text-[#707072]">{selectedOpponent.club} | {selectedOpponent.grade}</p>
+                <h3 className="font-display-md" style={{ fontSize: '36px', marginTop: '6px' }}>{selectedOpponent.name} 선수</h3>
+                <p style={{ fontSize: '14px', fontWeight: 600, color: '#707072' }}>{selectedOpponent.club} | {selectedOpponent.grade}</p>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="scout-grid-2">
               {/* Official Stats pulled from API */}
-              <div className="bg-white p-6 border border-[#cacacb] space-y-4">
-                <h4 className="font-bold text-sm text-[#707072] uppercase flex items-center gap-1.5 border-b border-[#e5e5e5] pb-2">
+              <div className="scout-stat-box">
+                <h4 className="scout-box-title">
                   <Activity size={16} /> 공식 대회 데이터 (BKPLAY 연동)
                 </h4>
-                <div className="space-y-3">
-                  <div className="flex justify-between">
-                    <span className="text-sm text-[#707072]">공식 통계 승률:</span>
-                    <span className="font-bold text-lg text-[#1eaa52]">{selectedOpponent.winRate}</span>
+                <div>
+                  <div className="scout-row">
+                    <span className="scout-row-label">공식 통계 승률:</span>
+                    <span className="scout-row-val" style={{ color: '#1eaa52', fontSize: '18px' }}>{selectedOpponent.winRate}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-[#707072]">주요 플레이 스타일:</span>
-                    <span className="font-bold text-sm text-[#111111]">{selectedOpponent.playStyle}</span>
+                  <div className="scout-row">
+                    <span className="scout-row-label">주요 플레이 스타일:</span>
+                    <span className="scout-row-val">{selectedOpponent.playStyle}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-[#707072]">최근 대회 입상:</span>
-                    <span className="font-bold text-sm text-[#d30005]">{selectedOpponent.recentTourney}</span>
+                  <div className="scout-row">
+                    <span className="scout-row-label">최근 대회 입상:</span>
+                    <span className="scout-row-val" style={{ color: '#d30005' }}>{selectedOpponent.recentTourney}</span>
                   </div>
                 </div>
               </div>
 
               {/* Secret Tactical Notes by User */}
-              <div className="bg-[#111111] text-white p-6 border border-[#111111] space-y-4 relative overflow-hidden">
-                <h4 className="font-bold text-sm text-[#f5f5f5] uppercase flex items-center gap-1.5 border-b border-[#39393b] pb-2">
-                  <ShieldAlert size={16} className="text-[#d30005]" /> 나의 1:1 맞춤 약점 공략 노트
+              <div className="scout-secret-box">
+                <h4 className="scout-box-title">
+                  <ShieldAlert size={16} color="#d30005" /> 나의 1:1 맞춤 약점 공략 노트
                 </h4>
-                <p className="text-sm text-[#f5f5f5] leading-relaxed font-medium">
+                <p style={{ fontSize: '14px', lineHeight: 1.6, color: '#f5f5f5', marginBottom: '16px' }}>
                   {selectedOpponent.scoutingNote}
                 </p>
-                <div className="pt-2">
+                <div>
                   <button 
                     onClick={() => {
                       const newNote = prompt("이 선수에 대한 스카우팅 노트를 수정하세요:", selectedOpponent.scoutingNote);
@@ -770,7 +770,7 @@ export default function App() {
                         alert("✅ Supabase 데이터베이스에 스카우팅 메모가 갱신되었습니다!");
                       }
                     }}
-                    className="btn-sale text-xs py-2 px-4"
+                    className="btn-sale"
                   >
                     <Edit3 size={12} /> 스카우팅 노트 업데이트
                   </button>
@@ -778,7 +778,7 @@ export default function App() {
               </div>
             </div>
 
-            <div className="text-center pt-4">
+            <div style={{ textAlign: 'center', marginTop: '24px' }}>
               <button 
                 onClick={() => setSelectedOpponent(null)} 
                 className="btn-primary"
@@ -790,16 +790,16 @@ export default function App() {
         )}
       </main>
 
-      {/* 6. MODAL: PLAYER & CLUB SEARCH (선수 및 클럽 검색 연동 창) */}
+      {/* 6. MODAL: PLAYER & CLUB SEARCH */}
       {isSearchingPlayer && (
-        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 animate-fadeIn">
-          <div className="bg-white max-w-2xl w-full p-8 border-2 border-[#111111] space-y-6 relative shadow-2xl rounded-none">
-            <div className="flex justify-between items-center border-b border-[#cacacb] pb-4">
+        <div className="modal-overlay">
+          <div className="modal-box">
+            <div className="modal-header">
               <div>
-                <span className="bg-[#d30005] text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase">
+                <span className="badge-red">
                   FEDERATION DB SEARCH
                 </span>
-                <h3 className="font-display-md text-3xl mt-1 flex items-center gap-2">
+                <h3 className="modal-title" style={{ marginTop: '6px' }}>
                   <SearchCode size={24} /> 내 클럽 및 선수 검색해서 연동하기
                 </h3>
               </div>
@@ -808,88 +808,89 @@ export default function App() {
               </button>
             </div>
 
-            <p className="text-sm text-[#707072]">
+            <p className="modal-desc">
               전남동호인 급수현황(netsystem) 및 BKPLAY 공식 DB에 등록된 본인의 <strong>이름이나 클럽명</strong>을 입력하세요.
             </p>
 
             {/* Search Input Box */}
-            <div className="flex gap-2">
-              <div className="search-pill-container flex-1 bg-[#f5f5f5] border-2 border-[#111111]">
-                <Search size={18} className="text-[#111111] ml-2" />
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+              <div className="search-pill-box" style={{ flex: 1, width: 'auto', border: '2px solid #111111', background: '#f5f5f5' }}>
+                <Search size={18} color="#111111" style={{ marginLeft: '8px' }} />
                 <input 
                   type="text" 
                   value={playerSearchKeyword}
                   onChange={(e) => setPlayerSearchKeyword(e.target.value)}
                   placeholder="예: 테크존, 광양시, 유정, 김서연..."
-                  className="search-pill-input font-bold text-base py-2.5"
+                  className="search-input"
+                  style={{ fontSize: '16px', fontWeight: 700, padding: '10px 8px' }}
                   autoFocus
                 />
                 {playerSearchKeyword && (
-                  <button onClick={() => setPlayerSearchKeyword("")} className="text-[#707072] mr-2">
+                  <button onClick={() => setPlayerSearchKeyword("")} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#707072', marginRight: '8px' }}>
                     <X size={16} />
                   </button>
                 )}
               </div>
-              <button className="btn-primary px-6">
+              <button className="btn-primary" style={{ padding: '0 24px' }}>
                 검색
               </button>
             </div>
 
             {/* Search Results Grid */}
-            <div className="space-y-3 max-h-[380px] overflow-y-auto pr-1">
-              <p className="text-xs font-bold text-[#707072] uppercase">
+            <div>
+              <p style={{ fontSize: '12px', fontWeight: 800, color: '#707072', textTransform: 'uppercase' }}>
                 검색 결과 ({filteredPlayersDb.length}명 발견)
               </p>
 
-              {filteredPlayersDb.length === 0 ? (
-                <div className="text-center py-12 bg-[#f5f5f5] rounded-lg">
-                  <p className="text-sm font-bold text-[#707072]">검색된 선수가 없습니다.</p>
-                  <p className="text-xs text-[#9e9ea0] mt-1">이름이나 클럽명을 다시 확인해주세요.</p>
-                </div>
-              ) : (
-                filteredPlayersDb.map(player => (
-                  <div 
-                    key={player.id}
-                    className="p-4 border border-[#cacacb] hover:border-[#111111] bg-[#f5f5f5] hover:bg-white transition-all flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 group"
-                  >
-                    <div className="flex items-center gap-3.5">
-                      <div className="w-11 h-11 bg-[#111111] text-white rounded-full flex items-center justify-center font-bold text-lg">
-                        {player.name[0]}
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <h4 className="font-bold text-lg text-[#111111] group-hover:text-[#d30005] transition-colors">
-                            {player.name}
-                          </h4>
-                          <span className="text-xs font-semibold bg-white px-2 py-0.5 rounded border border-[#cacacb]">
-                            {player.gender} · {player.birthYear}년생
-                          </span>
-                          <span className="text-xs font-bold bg-[#111111] text-white px-2 py-0.5 rounded">
-                            급수: {player.grade1}
-                          </span>
-                        </div>
-                        <p className="text-xs font-bold text-[#0a7281] mt-0.5">
-                          🏸 {player.club}
-                        </p>
-                        <p className="text-[11px] text-[#707072] mt-0.5">
-                          최근 기록: {player.recentEvent}
-                        </p>
-                      </div>
-                    </div>
-
-                    <button 
-                      onClick={() => handleSelectMyPlayer(player)}
-                      className="btn-primary text-xs py-2 px-4 whitespace-nowrap bg-[#111111] hover:bg-[#d30005] transition-colors"
-                    >
-                      <UserCheck size={14} /> 이 선수로 연동 선택
-                    </button>
+              <div className="search-results-list">
+                {filteredPlayersDb.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '48px 0', backgroundColor: '#f5f5f5', borderRadius: '8px' }}>
+                    <p style={{ fontSize: '14px', fontWeight: 800, color: '#707072' }}>검색된 선수가 없습니다.</p>
+                    <p style={{ fontSize: '12px', color: '#9e9ea0', marginTop: '4px' }}>이름이나 클럽명을 다시 확인해주세요.</p>
                   </div>
-                ))
-              )}
+                ) : (
+                  filteredPlayersDb.map(player => (
+                    <div key={player.id} className="player-result-row">
+                      <div className="player-result-info">
+                        <div className="scout-avatar" style={{ width: '44px', height: '44px', fontSize: '18px' }}>
+                          {player.name[0]}
+                        </div>
+                        <div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                            <h4 className="player-name">
+                              {player.name}
+                            </h4>
+                            <span style={{ fontSize: '12px', fontWeight: 600, backgroundColor: '#ffffff', padding: '2px 8px', border: '1px solid #cacacb', borderRadius: '4px' }}>
+                              {player.gender} · {player.birthYear}년생
+                            </span>
+                            <span style={{ fontSize: '12px', fontWeight: 800, backgroundColor: '#111111', color: '#ffffff', padding: '2px 8px', borderRadius: '4px' }}>
+                              급수: {player.grade1}
+                            </span>
+                          </div>
+                          <p className="player-club-tag">
+                            🏸 {player.club}
+                          </p>
+                          <p style={{ fontSize: '11px', color: '#707072', marginTop: '2px' }}>
+                            최근 기록: {player.recentEvent}
+                          </p>
+                        </div>
+                      </div>
+
+                      <button 
+                        onClick={() => handleSelectMyPlayer(player)}
+                        className="btn-primary"
+                        style={{ padding: '8px 16px', fontSize: '13px' }}
+                      >
+                        <UserCheck size={14} /> 이 선수로 연동 선택
+                      </button>
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
 
-            <div className="border-t border-[#cacacb] pt-4 flex justify-end">
-              <button onClick={() => setIsSearchingPlayer(false)} className="btn-secondary px-6">
+            <div style={{ borderTop: '1px solid #cacacb', paddingTop: '16px', display: 'flex', justifyContent: 'flex-end' }}>
+              <button onClick={() => setIsSearchingPlayer(false)} className="btn-secondary">
                 닫기
               </button>
             </div>
@@ -897,22 +898,22 @@ export default function App() {
         </div>
       )}
 
-      {/* 7. MODAL: MEMO EDITOR (실전 메모 작성 창) */}
+      {/* 7. MODAL: MEMO EDITOR */}
       {isEditingMemo !== null && (
-        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
-          <div className="bg-white max-w-lg w-full p-6 border-2 border-[#111111] space-y-6 relative shadow-2xl">
-            <div className="flex justify-between items-center border-b border-[#cacacb] pb-3">
-              <h3 className="font-display-md text-2xl flex items-center gap-2">
-                <Edit3 size={20} /> 실전 전술 일지 & 유튜브 기록
+        <div className="modal-overlay">
+          <div className="modal-box" style={{ maxWidth: '540px' }}>
+            <div className="modal-header">
+              <h3 className="modal-title">
+                <Edit3 size={24} /> 실전 전술 일지 & 유튜브 기록
               </h3>
               <button onClick={() => setIsEditingMemo(null)} className="btn-icon-circle">
                 <X size={18} />
               </button>
             </div>
 
-            <div className="space-y-4">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '24px' }}>
               <div>
-                <label className="text-xs font-bold text-[#111111] block mb-1">
+                <label className="form-label" style={{ color: '#111111', marginBottom: '6px' }}>
                   1. 이 경기에서 무엇을 배웠나요? (상대방 약점, 파트너 피드백 등)
                 </label>
                 <textarea 
@@ -920,12 +921,13 @@ export default function App() {
                   value={memoText}
                   onChange={(e) => setMemoText(e.target.value)}
                   placeholder="예: 상대 전위가 드롭이 강함. 후반에 드라이브 승부로 역전 성공!"
-                  className="w-full p-3 border border-[#cacacb] rounded-lg text-sm text-[#111111] focus:outline-none focus:border-[#111111]"
+                  className="form-input"
+                  style={{ fontWeight: 500 }}
                 />
               </div>
 
               <div>
-                <label className="text-xs font-bold text-[#111111] block mb-1">
+                <label className="form-label" style={{ color: '#111111', marginBottom: '6px' }}>
                   2. 유튜브 경기 영상 링크 (선택사항)
                 </label>
                 <input 
@@ -933,16 +935,17 @@ export default function App() {
                   value={videoText}
                   onChange={(e) => setVideoText(e.target.value)}
                   placeholder="https://youtu.be/..."
-                  className="w-full p-3 border border-[#cacacb] rounded-lg text-sm text-[#111111] focus:outline-none focus:border-[#111111]"
+                  className="form-input"
+                  style={{ fontWeight: 500 }}
                 />
               </div>
             </div>
 
-            <div className="flex gap-3 pt-2">
-              <button onClick={() => saveMemo(isEditingMemo)} className="btn-primary flex-1 justify-center">
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button onClick={() => saveMemo(isEditingMemo)} className="btn-primary" style={{ flex: 1 }}>
                 <CheckCircle2 size={16} /> Supabase DB에 영구 저장
               </button>
-              <button onClick={() => setIsEditingMemo(null)} className="btn-secondary px-6">
+              <button onClick={() => setIsEditingMemo(null)} className="btn-secondary">
                 취소
               </button>
             </div>
@@ -951,31 +954,31 @@ export default function App() {
       )}
 
       {/* 8. NIKE FOOTER */}
-      <footer className="bg-[#111111] text-white border-t border-[#39393b] mt-16 px-6 py-12">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-start gap-8">
+      <footer className="app-footer">
+        <div className="footer-content">
           <div>
-            <div className="flex items-center gap-2 mb-2">
-              <div className="bg-white text-[#111111] w-6 h-6 rounded-full flex items-center justify-center font-black text-xs">
+            <div className="footer-brand-row">
+              <div className="footer-logo-box">
                 MD
               </div>
-              <span className="font-display-md text-xl">MINTON DIARY</span>
+              <span className="font-display-md" style={{ fontSize: '20px' }}>MINTON DIARY</span>
             </div>
-            <p className="text-xs text-[#9e9ea0]">
+            <p className="footer-text">
               Powered by Nike Athletic Editorial Design System & Supabase Cloud.<br />
               전남동호인 급수현황(netsystem) 및 BKPLAY(sfa.bkplay.kr) 자동 동기화 엔진 탑재.
             </p>
           </div>
           
-          <div className="flex gap-8 text-xs text-[#9e9ea0]">
+          <div className="footer-links-grid">
             <div>
-              <p className="font-bold text-white mb-2">DATA SOURCES</p>
-              <p className="hover:text-white cursor-pointer">BKPLAY Official API</p>
-              <p className="hover:text-white cursor-pointer mt-1">Netsystem Jeonnam</p>
+              <p className="footer-col-title">DATA SOURCES</p>
+              <a className="footer-link">BKPLAY Official API</a>
+              <a className="footer-link">Netsystem Jeonnam</a>
             </div>
             <div>
-              <p className="font-bold text-white mb-2">MY CLOUD</p>
-              <p className="hover:text-white cursor-pointer">Supabase DB Sync</p>
-              <p className="hover:text-white cursor-pointer mt-1">Export Excel / CSV</p>
+              <p className="footer-col-title">MY CLOUD</p>
+              <a className="footer-link">Supabase DB Sync</a>
+              <a className="footer-link">Export Excel / CSV</a>
             </div>
           </div>
         </div>
