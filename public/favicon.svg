@@ -1,13 +1,62 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
-  <!-- Sleek iOS-style rounded black background -->
-  <rect width="512" height="512" rx="128" fill="#111111" />
-  
-  <!-- Subtle athletic grid lines or slash accent -->
-  <path d="M0 400 L512 100" stroke="#222222" stroke-width="24" />
-  
-  <!-- Nike Athletic Editorial Typography 'MD' -->
-  <text x="256" y="345" font-family="'Anton', 'Bebas Neue', 'Impact', 'Arial Black', sans-serif" font-size="280" font-weight="900" fill="#ffffff" text-anchor="middle" letter-spacing="-5">MD</text>
-  
-  <!-- Iconic Sale-Red Live Dot / Shuttlecock Accent -->
-  <circle cx="380" cy="150" r="36" fill="#d30005" />
+  <defs>
+    <!-- Sleek background gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#18181c" />
+      <stop offset="100%" stop-color="#09090b" />
+    </linearGradient>
+
+    <!-- Nike Volt Neon Glow -->
+    <filter id="voltGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="12" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- 1. Sleek iOS-style obsidian background -->
+  <rect width="512" height="512" rx="115" fill="url(#bgGrad)" />
+
+  <!-- 2. Dynamic Court / Smash Angle Arc in Nike Volt Neon Green (#ccff00) -->
+  <circle cx="256" cy="225" r="150" fill="none" stroke="#ccff00" stroke-width="8" stroke-dasharray="160 80" stroke-linecap="round" transform="rotate(-35 256 225)" opacity="0.85" />
+
+  <!-- 3. Dynamic Smash Speed Swooshes -->
+  <path d="M 150 90 Q 256 50 362 90" fill="none" stroke="#ccff00" stroke-width="10" stroke-linecap="round" filter="url(#voltGlow)" />
+  <path d="M 185 65 Q 256 35 327 65" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round" opacity="0.4" />
+
+  <!-- 4. HERO GRAPHIC: High-Contrast Geometric Shuttlecock -->
+  <g transform="translate(0, 10)">
+    <!-- Skirt (Feathers Background Shadow/Glow) -->
+    <polygon points="216,285 130,115 382,115 296,285" fill="#1f1f24" />
+
+    <!-- Feather Blade 1 (Far Left) -->
+    <polygon points="218,285 135,115 185,115 235,285" fill="#ffffff" />
+    
+    <!-- Feather Blade 2 (Mid Left) -->
+    <polygon points="235,285 180,115 235,115 252,285" fill="#e2e2e6" />
+    
+    <!-- Feather Blade 3 (Center Hero Blade) -->
+    <polygon points="248,285 230,112 282,112 264,285" fill="#ffffff" />
+    
+    <!-- Feather Blade 4 (Mid Right) -->
+    <polygon points="260,285 277,115 332,115 277,285" fill="#e2e2e6" />
+    
+    <!-- Feather Blade 5 (Far Right) -->
+    <polygon points="277,285 327,115 377,115 294,285" fill="#ffffff" />
+
+    <!-- Feather Horizontal Ribs (Authentic Shuttlecock Structure) -->
+    <path d="M 160 175 L 352 175" stroke="#18181c" stroke-width="6" stroke-linecap="round" />
+    <path d="M 188 230 L 324 230" stroke="#18181c" stroke-width="6" stroke-linecap="round" />
+
+    <!-- Shuttlecock Base Tape (White & Red Accent Line) -->
+    <rect x="206" y="283" width="100" height="18" rx="6" fill="#ffffff" />
+    <rect x="206" y="297" width="100" height="6" fill="#d30005" />
+
+    <!-- Shuttlecock Head (Cork) - Glowing Nike Volt Neon Green -->
+    <path d="M 210 303 C 210 355, 302 355, 302 303 Z" fill="#ccff00" filter="url(#voltGlow)" />
+    <path d="M 210 303 C 210 355, 302 355, 302 303 Z" fill="#ccff00" />
+  </g>
+
+  <!-- 5. Nike Athletic Editorial Brand Lockup at Bottom -->
+  <text x="256" y="445" font-family="'Anton', 'Bebas Neue', 'Impact', 'Arial Black', sans-serif" font-size="52" font-weight="900" fill="#ffffff" text-anchor="middle" letter-spacing="3">MINTON DIARY</text>
+  <circle cx="438" cy="430" r="8" fill="#ccff00" filter="url(#voltGlow)" />
 </svg>
