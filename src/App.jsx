@@ -9,20 +9,67 @@ export default function App() {
   
   // 1. BULLETPROOF PERMANENT STORAGE (Never loses data on refresh!)
   const [matches, setMatches] = useState(() => {
-    const saved = localStorage.getItem("minton_diary_records_v1");
+    const saved = localStorage.getItem("minton_diary_records_v2") || localStorage.getItem("minton_diary_records_v1");
+    let parsed = [];
     if (saved) {
       try {
-        return JSON.parse(saved);
+        parsed = JSON.parse(saved);
       } catch (e) {
-        return [];
+        parsed = [];
       }
     }
-    return [];
+
+    const defaultBkRecords = [
+      {
+        id: "bk_2026_1",
+        tournament: "🏆 제8회 전라남도의장기 클럽최강전 배드민턴대회 (광양 성황체육관)",
+        date: "2026.06.28",
+        score: "여복 2위 🥈",
+        result: "AWARD",
+        memo: "[BKPLAY 공인 기록] 광양테크존클럽 소속 여복 30 D급 2위 입상",
+        videoUrl: "",
+        matchStream: [
+          { round: "예선 1경기", opponent: "vs 광양클럽 (김OO/이OO)", score: "25 : 19", result: "승" },
+          { round: "예선 2경기", opponent: "vs 중마클럽 (박OO/최OO)", score: "25 : 22", result: "승" },
+          { round: "8강전", opponent: "vs 백운클럽 (정OO/강OO)", score: "25 : 18", result: "승" },
+          { round: "4강전", opponent: "vs 섬진강클럽 (한OO/윤OO)", score: "25 : 23", result: "승" },
+          { round: "결승전", opponent: "vs 테크존클럽 (김OO/박OO)", score: "21 : 25", result: "패" }
+        ]
+      },
+      {
+        id: "bk_2026_2",
+        tournament: "제11회 여수거북선배 전국배드민턴대회 (S급 전국Open)",
+        date: "2026.04.05",
+        score: "여복 3위 🥉",
+        result: "AWARD",
+        memo: "[BKPLAY 공인 기록] 광양시 소속 여복 30 초심 3위 입상",
+        videoUrl: "",
+        matchStream: [
+          { round: "예선 1경기", opponent: "vs 여수클럽 (최OO/정OO)", score: "25 : 20", result: "승" },
+          { round: "예선 2경기", opponent: "vs 순천클럽 (이OO/강OO)", score: "25 : 17", result: "승" },
+          { round: "8강전", opponent: "vs 광양시클럽 (박OO/김OO)", score: "25 : 21", result: "승" },
+          { round: "4강전", opponent: "vs 여수클럽 (조OO/한OO)", score: "23 : 25", result: "패" }
+        ]
+      }
+    ];
+
+    if (parsed.length === 0) {
+      return defaultBkRecords;
+    }
+
+    // 자동 마이그레이션: 기존 로컬스토리지 데이터 중 화려한 수식어(🔥, 자랑스러운 등)가 남아있거나 matchStream이 없는 공인 기록을 최신 깔끔 버전으로 자동 교체
+    return parsed.map(m => {
+      const def = defaultBkRecords.find(d => d.id === m.id);
+      if (def && (!m.matchStream || m.memo.includes("🔥") || m.memo.includes("자랑스러운") || m.memo.includes("!!"))) {
+        return def;
+      }
+      return m;
+    });
   });
 
   // Automatically save to phone storage whenever matches change
   useEffect(() => {
-    localStorage.setItem("minton_diary_records_v1", JSON.stringify(matches));
+    localStorage.setItem("minton_diary_records_v2", JSON.stringify(matches));
   }, [matches]);
   
   // Modal State (Bottom Sheet) for adding/editing a match
