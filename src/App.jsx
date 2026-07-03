@@ -34,6 +34,7 @@ export default function App() {
   const [newResult, setNewResult] = useState("WIN");
   const [newMemo, setNewMemo] = useState("");
   const [newVideo, setNewVideo] = useState("");
+  const [newMatchStream, setNewMatchStream] = useState([]);
 
   // 2. REAL UPCOMING TOURNAMENTS FROM JULY 2026 ONWARDS (All May/June 2026 past events removed!)
   const [tournamentsList, setTournamentsList] = useState([
@@ -71,8 +72,15 @@ export default function App() {
           date: "2026.06.28",
           score: "여복 2위 🥈",
           result: "AWARD",
-          memo: "[BKPLAY 공인 기록] 광양테크존클럽 소속 개인전 여복 30 D급 2위 입상! (바로 저번주 광양 홈그라운드에서 따낸 자랑스러운 최신 기록!! 🔥)",
-          videoUrl: ""
+          memo: "[BKPLAY 공인 기록] 광양테크존클럽 소속 여복 30 D급 2위 입상",
+          videoUrl: "",
+          matchStream: [
+            { round: "예선 1경기", opponent: "vs 광양클럽 (김OO/이OO)", score: "25 : 19", result: "승" },
+            { round: "예선 2경기", opponent: "vs 중마클럽 (박OO/최OO)", score: "25 : 22", result: "승" },
+            { round: "8강전", opponent: "vs 백운클럽 (정OO/강OO)", score: "25 : 18", result: "승" },
+            { round: "4강전", opponent: "vs 섬진강클럽 (한OO/윤OO)", score: "25 : 23", result: "승" },
+            { round: "결승전", opponent: "vs 테크존클럽 (김OO/박OO)", score: "21 : 25", result: "패" }
+          ]
         },
         {
           id: "bk_2026_2",
@@ -80,8 +88,14 @@ export default function App() {
           date: "2026.04.05",
           score: "여복 3위 🥉",
           result: "AWARD",
-          memo: "[BKPLAY 공인 기록] 광양시 소속 개인전 여복 30 초심 3위 입상 (2026년 상반기 여수 대회)",
-          videoUrl: ""
+          memo: "[BKPLAY 공인 기록] 광양시 소속 여복 30 초심 3위 입상",
+          videoUrl: "",
+          matchStream: [
+            { round: "예선 1경기", opponent: "vs 여수클럽 (최OO/정OO)", score: "25 : 20", result: "승" },
+            { round: "예선 2경기", opponent: "vs 순천클럽 (이OO/강OO)", score: "25 : 17", result: "승" },
+            { round: "8강전", opponent: "vs 광양시클럽 (박OO/김OO)", score: "25 : 21", result: "승" },
+            { round: "4강전", opponent: "vs 여수클럽 (조OO/한OO)", score: "23 : 25", result: "패" }
+          ]
         }
       ];
 
@@ -104,6 +118,7 @@ export default function App() {
     setNewResult("WIN");
     setNewMemo("");
     setNewVideo("");
+    setNewMatchStream([]);
     setIsAddingMatch(true);
   };
 
@@ -115,6 +130,7 @@ export default function App() {
     setNewResult(match.result);
     setNewMemo(match.memo || "");
     setNewVideo(match.videoUrl || "");
+    setNewMatchStream(match.matchStream || []);
     setIsAddingMatch(true);
   };
 
@@ -135,7 +151,8 @@ export default function App() {
             score: newScore,
             result: newResult,
             memo: newMemo,
-            videoUrl: newVideo
+            videoUrl: newVideo,
+            matchStream: newMatchStream
           };
         }
         return m;
@@ -149,7 +166,8 @@ export default function App() {
         score: newScore,
         result: newResult,
         memo: newMemo,
-        videoUrl: newVideo
+        videoUrl: newVideo,
+        matchStream: newMatchStream
       };
       setMatches([newEntry, ...matches]);
     }
@@ -277,6 +295,37 @@ export default function App() {
                       <span>🏸 결과 / 스코어</span>
                       <strong style={{ fontSize: '14px', color: '#111111' }}>{match.score}</strong>
                     </div>
+
+                    {match.matchStream && match.matchStream.length > 0 && (
+                      <div style={{ margin: '10px 0', border: '1px solid #e5e5ea', borderRadius: '8px', overflow: 'hidden' }}>
+                        <div style={{ background: '#f2f2f7', padding: '6px 12px', fontSize: '12px', fontWeight: 700, color: '#48484a', borderBottom: '1px solid #e5e5ea' }}>
+                          매치별 상세 결과
+                        </div>
+                        <div>
+                          {match.matchStream.map((item, idx) => (
+                            <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '7px 12px', borderBottom: idx === match.matchStream.length - 1 ? 'none' : '1px solid #f2f2f7', fontSize: '13px' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: 0 }}>
+                                <span style={{ fontWeight: 700, color: '#636366', fontSize: '12px', width: '65px', flexShrink: 0 }}>{item.round}</span>
+                                <span style={{ color: '#1c1c1e', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.opponent}</span>
+                              </div>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
+                                <span style={{ fontWeight: 700, color: '#1c1c1e', fontFamily: 'monospace', fontSize: '13px' }}>{item.score}</span>
+                                <span style={{ 
+                                  fontSize: '11px', 
+                                  fontWeight: 700, 
+                                  padding: '2px 6px', 
+                                  borderRadius: '4px',
+                                  background: item.result === "승" ? '#e6f4ea' : '#fce8e6',
+                                  color: item.result === "승" ? '#137333' : '#c5221f'
+                                }}>
+                                  {item.result}
+                                </span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
 
                     {match.memo && (
                       <div className="match-memo-box">
@@ -414,6 +463,85 @@ export default function App() {
                     className="input-mobile"
                   />
                 </div>
+              </div>
+
+              {/* 매치별 상세 결과 깔끔 입력란 */}
+              <div style={{ marginTop: '14px', marginBottom: '14px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                  <label style={{ fontSize: '12px', fontWeight: 700, color: '#8e8e93' }}>매치별 상세 결과 (예선 ~ 본선)</label>
+                  <button 
+                    type="button"
+                    onClick={() => setNewMatchStream([...newMatchStream, { round: "예선 1경기", opponent: "", score: "25 : ", result: "승" }])}
+                    style={{ background: '#f2f2f7', border: '1px solid #d1d1d6', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: 700, color: '#1c1c1e', cursor: 'pointer' }}
+                  >
+                    + 경기 추가
+                  </button>
+                </div>
+
+                {newMatchStream.length === 0 ? (
+                  <p style={{ fontSize: '12px', color: '#8e8e93', margin: 0, padding: '8px', background: '#f8f9fa', borderRadius: '8px', textAlign: 'center' }}>
+                    상대편 선수, 스코어, 승패만 입력하려면 [+ 경기 추가]를 눌러주세요.
+                  </p>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {newMatchStream.map((item, index) => (
+                      <div key={index} style={{ display: 'grid', gridTemplateColumns: '70px 1fr 60px 48px 24px', gap: '6px', alignItems: 'center', background: '#f9f9fa', padding: '8px', borderRadius: '8px', border: '1px solid #e5e5ea' }}>
+                        <input 
+                          type="text"
+                          placeholder="라운드"
+                          value={item.round}
+                          onChange={(e) => {
+                            const updated = [...newMatchStream];
+                            updated[index].round = e.target.value;
+                            setNewMatchStream(updated);
+                          }}
+                          style={{ fontSize: '12px', padding: '6px', borderRadius: '6px', border: '1px solid #d1d1d6', width: '100%', boxSizing: 'border-box' }}
+                        />
+                        <input 
+                          type="text"
+                          placeholder="상대편 선수/팀"
+                          value={item.opponent}
+                          onChange={(e) => {
+                            const updated = [...newMatchStream];
+                            updated[index].opponent = e.target.value;
+                            setNewMatchStream(updated);
+                          }}
+                          style={{ fontSize: '12px', padding: '6px', borderRadius: '6px', border: '1px solid #d1d1d6', width: '100%', boxSizing: 'border-box' }}
+                        />
+                        <input 
+                          type="text"
+                          placeholder="25:19"
+                          value={item.score}
+                          onChange={(e) => {
+                            const updated = [...newMatchStream];
+                            updated[index].score = e.target.value;
+                            setNewMatchStream(updated);
+                          }}
+                          style={{ fontSize: '12px', padding: '6px', borderRadius: '6px', border: '1px solid #d1d1d6', width: '100%', boxSizing: 'border-box', textAlign: 'center', fontFamily: 'monospace' }}
+                        />
+                        <select
+                          value={item.result}
+                          onChange={(e) => {
+                            const updated = [...newMatchStream];
+                            updated[index].result = e.target.value;
+                            setNewMatchStream(updated);
+                          }}
+                          style={{ fontSize: '12px', padding: '5px 2px', borderRadius: '6px', border: '1px solid #d1d1d6', width: '100%', boxSizing: 'border-box', fontWeight: 700 }}
+                        >
+                          <option value="승">승</option>
+                          <option value="패">패</option>
+                        </select>
+                        <button 
+                          type="button"
+                          onClick={() => setNewMatchStream(newMatchStream.filter((_, i) => i !== index))}
+                          style={{ background: 'none', border: 'none', color: '#ff3b30', cursor: 'pointer', padding: '2px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                        >
+                          <X size={16} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <label style={{ fontSize: '12px', fontWeight: 700, color: '#8e8e93' }}>실전 전술 메모 및 배운 점</label>
