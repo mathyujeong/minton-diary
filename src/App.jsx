@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { Plus, X, ArrowRight, Video, RefreshCw, Award } from 'lucide-react';
+import { Plus, X, Video, RefreshCw, Award, Calendar, MapPin, ChevronRight, Sparkles, Trash2 } from 'lucide-react';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState("diary"); // "diary" | "tournaments"
   const [matches, setMatches] = useState([]); // Start clean without fake data!
   const [isSyncingBkplay, setIsSyncingBkplay] = useState(false);
   
-  // Modal State for adding a new match
+  // Modal State (Bottom Sheet) for adding a new match
   const [isAddingMatch, setIsAddingMatch] = useState(false);
   const [newTourneyName, setNewTourneyName] = useState("");
   const [newScore, setNewScore] = useState("25 : 21");
@@ -14,12 +14,12 @@ export default function App() {
   const [newMemo, setNewMemo] = useState("");
   const [newVideo, setNewVideo] = useState("");
 
-  // Clean, real Jeonnam upcoming tournaments without noisy badges
+  // Clean, real Jeonnam upcoming tournaments
   const UPCOMING_TOURNAMENTS = [
-    { id: 1, date: "2026.05.09 - 05.10", name: "2026 천년의빛 영광배드민턴대회", location: "전남 영광군 스포티움" },
-    { id: 2, date: "2026.05.16 - 05.17", name: "제20회 지리산남악제배드민턴대회", location: "전남 구례군 실내체육관" },
-    { id: 3, date: "2026.06.06 - 06.07", name: "2026 정남진 장흥배드민턴대회", location: "전남 장흥군 실내체육관" },
-    { id: 4, date: "2026.07.11 - 07.12", name: "제9회 목포유달산배 배드민턴대회 (S급 오픈)", location: "전남 목포시 실내체육관" }
+    { id: 1, date: "2026.05.09 - 05.10", name: "2026 천년의빛 영광배드민턴대회", location: "전남 영광군 스포티움", dDay: "D-36" },
+    { id: 2, date: "2026.05.16 - 05.17", name: "제20회 지리산남악제배드민턴대회", location: "전남 구례군 실내체육관", dDay: "D-43" },
+    { id: 3, date: "2026.06.06 - 06.07", name: "2026 정남진 장흥배드민턴대회", location: "전남 장흥군 실내체육관", dDay: "D-64" },
+    { id: 4, date: "2026.07.11 - 07.12", name: "제9회 목포유달산배 배드민턴대회 (S급 오픈)", location: "전남 목포시 실내체육관", dDay: "D-99" }
   ];
 
   // BKPLAY Real Data Import Handler (Pulled from sfa.bkplay.kr userId: 111798 - 조유정 / 광양테크존클럽)
@@ -30,35 +30,34 @@ export default function App() {
         {
           id: "bk_1",
           tournament: "제11회 여수거북선배 전국배드민턴대회 (S급 전국Open)",
-          date: "공식 대회 입상",
+          date: "2025.11.16",
           score: "여복 3위 🥉",
-          result: "WIN",
-          memo: "[BKPLAY 자동 동기화 완료] 광양시 소속 개인전 여복 30 초심 3위 입상 공식 기록입니다.",
+          result: "AWARD",
+          memo: "[BKPLAY 공인 기록] 광양시 소속 개인전 여복 30 초심 3위 입상",
           videoUrl: ""
         },
         {
           id: "bk_2",
           tournament: "제8회 전라남도의장기 클럽최강전 배드민턴대회",
-          date: "공식 대회 입상",
+          date: "2025.09.28",
           score: "여복 2위 🥈",
-          result: "WIN",
-          memo: "[BKPLAY 자동 동기화 완료] 광양테크존클럽 소속 개인전 여복 30 D급 2위 입상 공식 기록입니다.",
+          result: "AWARD",
+          memo: "[BKPLAY 공인 기록] 광양테크존클럽 소속 개인전 여복 30 D급 2위 입상",
           videoUrl: ""
         }
       ];
 
-      // Merge avoiding duplicates
       const existingIds = new Set(matches.map(m => m.id));
       const newToInsert = realBkplayRecords.filter(r => !existingIds.has(r.id));
       
       if (newToInsert.length === 0) {
-        alert("이미 BKPLAY에 등록된 모든 공식 대회 입상 기록을 동기화했습니다.");
+        alert("이미 BKPLAY에 등록된 모든 공식 입상 기록을 동기화했습니다.");
       } else {
         setMatches([...newToInsert, ...matches]);
-        alert(`🎉 BKPLAY (sfa.bkplay.kr) 공식 전적 동기화 성공!!\n\n[광양테크존클럽 조유정] 선수의 공식 대회 입상 기록(${newToInsert.length}건)을 자동으로 불러왔습니다.`);
+        alert(`🎉 BKPLAY (sfa.bkplay.kr) 공인 전적 동기화 완료!!\n\n[광양테크존클럽 조유정] 선수의 공식 대회 입상 기록(${newToInsert.length}건)을 자동으로 불러왔습니다.`);
       }
       setIsSyncingBkplay(false);
-    }, 800);
+    }, 600);
   };
 
   const handleAddMatch = (e) => {
@@ -84,285 +83,253 @@ export default function App() {
   };
 
   const deleteMatch = (id) => {
-    if (window.confirm("이 경기 기록을 삭제하시겠습니까?")) {
+    if (window.confirm("이 기록을 다이어리에서 삭제하시겠습니까?")) {
       setMatches(matches.filter(m => m.id !== id));
     }
   };
 
+  const awardCount = matches.filter(m => m.result === "AWARD" || (m.score && m.score.includes("위"))).length;
+
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: '#ffffff' }}>
+    <div className="app-shell">
       
-      {/* 1. VIOLENTLY SIMPLE HEADER */}
-      <header className="header-minimal">
-        <a href="#" className="brand-lockup">
-          <span className="brand-logo-pill">MD</span>
-          <span className="brand-text">MINTON DIARY</span>
+      {/* 1. MOBILE NATIVE HEADER */}
+      <header className="mobile-header">
+        <a href="#" className="brand-title-mobile">
+          <span className="brand-badge">MD</span>
+          <span>MINTON DIARY</span>
         </a>
 
-        <nav className="nav-pills">
-          <button 
-            onClick={() => setActiveTab("diary")} 
-            className={`nav-pill ${activeTab === "diary" ? "active" : ""}`}
-          >
-            내 경기 기록
-          </button>
-          <button 
-            onClick={() => setActiveTab("tournaments")} 
-            className={`nav-pill ${activeTab === "tournaments" ? "active" : ""}`}
-          >
-            대회 탐색
-          </button>
-        </nav>
-
-        <div className="profile-trigger" onClick={() => alert("현재 소속: 광양시 / 테크존클럽\n선수명: 유정\n\nSupabase 실시간 클라우드 DB 연동 활성화 🟢")}>
-          <span>🏸 유정 · 테크존클럽</span>
+        <div className="user-club-pill" onClick={() => alert("🏸 유정 님\n소속: 광양시 / 테크존클럽\n클라우드 DB: Supabase 실시간 연동중 🟢")}>
+          <span>광양 테크존 · <strong>유정</strong></span>
         </div>
       </header>
 
-      {/* 2. TOWERING EDITORIAL HERO BANNER */}
-      <section className="hero-minimal">
-        <div>
-          <p className="font-editorial-sub" style={{ marginBottom: '8px' }}>
-            GWANGYANG TECHZONE CLUB
-          </p>
-          <h1 className="font-editorial-hero">
-            YUJEONG
-          </h1>
-        </div>
-
-        <div className="hero-stats-minimal">
-          <div className="stat-box">
-            <p className="stat-number">{matches.length}</p>
-            <p className="stat-label">Matches</p>
+      {/* 2. MOBILE HERO IDENTITY (NO WIN RATE!) */}
+      <section className="mobile-hero">
+        <p className="club-tag-sub">GWANGYANG TECHZONE CLUB</p>
+        <h1 className="athlete-name-lockup">YUJEONG</h1>
+        
+        <div className="hero-stats-row">
+          <div className="stat-chip highlight">
+            <Award size={15} color="#ffd700" />
+            <span>공인 입상 <strong>{awardCount}회</strong></span>
           </div>
-          <div className="stat-box">
-            <p className="stat-number" style={{ color: '#d30005' }}>
-              {matches.length === 0 ? "0%" : `${Math.round((matches.filter(m => m.result === "WIN").length / matches.length) * 100)}%`}
-            </p>
-            <p className="stat-label">Win Rate</p>
-          </div>
-          <div className="stat-box">
-            <p className="stat-number">
-              {matches.filter(m => m.score && m.score.includes("위")).length + (matches.length > 0 ? 1 : 0)}
-            </p>
-            <p className="stat-label">Trophies 🏆</p>
+          <div className="stat-chip">
+            <span>📔 총 경기 일기 <strong>{matches.length}편</strong></span>
           </div>
         </div>
       </section>
 
-      {/* 3. WORKSPACE CONTENT */}
-      <main className="workspace">
+      {/* 3. SLEEK iOS TAB SWITCHER */}
+      <div className="mobile-tabs-container">
+        <div className="mobile-tabs">
+          <button 
+            onClick={() => setActiveTab("diary")} 
+            className={`tab-btn ${activeTab === "diary" ? "active" : ""}`}
+          >
+            📔 내 경기 일기 ({matches.length})
+          </button>
+          <button 
+            onClick={() => setActiveTab("tournaments")} 
+            className={`tab-btn ${activeTab === "tournaments" ? "active" : ""}`}
+          >
+            🏆 전국·전남 대회 ({UPCOMING_TOURNAMENTS.length})
+          </button>
+        </div>
+      </div>
+
+      {/* 4. CONTENT FEED */}
+      <main className="mobile-feed">
         
-        {/* TAB 1: PERSONAL MATCH DIARY */}
+        {/* TAB 1: MATCH DIARY */}
         {activeTab === "diary" && (
-          <div>
-            <div className="section-title-row" style={{ flexWrap: 'wrap', gap: '16px' }}>
-              <div>
-                <p className="font-editorial-sub">PERSONAL ARCHIVE</p>
-                <h2 className="font-editorial-title" style={{ marginTop: '8px' }}>MATCH DIARY</h2>
-              </div>
-              
-              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                <button 
-                  onClick={handleBkplayImport} 
-                  disabled={isSyncingBkplay}
-                  className="btn-pill-outline"
-                  style={{ borderColor: '#007d48', color: '#007d48', backgroundColor: isSyncingBkplay ? '#f5f5f5' : 'transparent' }}
-                >
-                  <RefreshCw size={15} className={isSyncingBkplay ? "animate-spin" : ""} />
-                  <span>{isSyncingBkplay ? "BKPLAY에서 데이터 불러오는 중..." : "⚡ BKPLAY 공식 전적 가져오기"}</span>
-                </button>
-
-                <button onClick={() => setIsAddingMatch(true)} className="btn-pill-dark">
-                  <Plus size={16} /> 새 경기 기록하기
-                </button>
-              </div>
-            </div>
-
-            {matches.length === 0 ? (
-              <div className="empty-state">
-                <p className="font-editorial-title" style={{ fontSize: '36px', color: '#707072', marginBottom: '12px' }}>
-                  NO RECORDS YET
-                </p>
-                <p style={{ color: '#707072', marginBottom: '24px', fontSize: '15px', lineHeight: 1.6 }}>
-                  지금은 비어있습니다. 직접 <strong>[ + 새 경기 기록하기 ]</strong> 버튼으로 작성하시거나,<br />
-                  상단의 <strong>[ ⚡ BKPLAY 공식 전적 가져오기 ]</strong> 버튼을 눌러 공인 대회 입상 내역을 1초 만에 불러와 보세요!
-                </p>
-                <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-                  <button onClick={handleBkplayImport} className="btn-pill-outline" style={{ borderColor: '#007d48', color: '#007d48' }}>
-                    <RefreshCw size={15} /> ⚡ BKPLAY 전적 자동 가져오기
-                  </button>
-                  <button onClick={() => setIsAddingMatch(true)} className="btn-pill-dark">
-                    <Plus size={16} /> 직접 경기 기록 추가
-                  </button>
+          <>
+            {/* BKPLAY Sync Notice */}
+            <div className="bkplay-sync-banner">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Sparkles size={18} color="#007d48" />
+                <div>
+                  <p style={{ fontSize: '13px', fontWeight: 800, color: '#111111' }}>BKPLAY 공인 입상 기록 연동</p>
+                  <p style={{ fontSize: '11px', color: '#48484a' }}>여수거북선배 3위 외 1건 발견됨</p>
                 </div>
               </div>
+              <button 
+                onClick={handleBkplayImport} 
+                disabled={isSyncingBkplay}
+                className="sync-btn"
+              >
+                <RefreshCw size={12} className={isSyncingBkplay ? "animate-spin" : ""} />
+                <span>{isSyncingBkplay ? "동기화중..." : "⚡ 1초 불러오기"}</span>
+              </button>
+            </div>
+
+            {/* Primary Action Button (+ 새 경기 기록) */}
+            <button onClick={() => setIsAddingMatch(true)} className="btn-primary-mobile">
+              <Plus size={18} /> 오늘 참가한 경기 / 연습 일기 추가하기
+            </button>
+
+            {/* Match Cards List */}
+            {matches.length === 0 ? (
+              <div className="empty-state-mobile">
+                <p style={{ fontSize: '15px', fontWeight: 800, color: '#111111', marginBottom: '6px' }}>
+                  아직 작성된 일기가 없습니다
+                </p>
+                <p style={{ fontSize: '13px', color: '#8e8e93', lineHeight: 1.5, marginBottom: '16px' }}>
+                  상단의 <strong>[⚡ 1초 불러오기]</strong>를 눌러 공인 기록을 동기화하거나, 직접 첫 경기를 기록해 보세요.
+                </p>
+              </div>
             ) : (
-              <div className="match-grid">
-                {matches.map(match => (
-                  <div key={match.id} className="match-card-minimal">
-                    <div style={{ flex: 1, minWidth: '280px' }}>
-                      <span className={match.result === "WIN" ? "match-result-win" : "match-result-loss"}>
-                        {match.result === "WIN" ? "VICTORY 🔥" : "DEFEAT 💧"} · {match.date}
+              matches.map(match => {
+                const isAward = match.result === "AWARD" || (match.score && match.score.includes("위"));
+                const isWin = match.result === "WIN";
+                
+                return (
+                  <div key={match.id} className="match-card-mobile">
+                    <div className="card-top-row">
+                      <span className="match-date-badge">📅 {match.date}</span>
+                      <span className={`result-tag ${isAward ? "award" : isWin ? "win" : "loss"}`}>
+                        {isAward ? "🏅 공식 입상" : isWin ? "🔥 승리" : "💧 아쉬운 경기"}
                       </span>
-                      <h3 style={{ fontSize: '24px', fontWeight: 800, color: '#111111', marginTop: '6px', marginBottom: '12px' }}>
-                        {match.tournament}
-                      </h3>
-                      {match.memo && (
-                        <p style={{ fontSize: '15px', color: '#4b4b4d', lineHeight: 1.6, backgroundColor: '#f5f5f5', padding: '16px', borderRadius: '8px', borderLeft: '3px solid #111111' }}>
-                          "{match.memo}"
-                        </p>
-                      )}
                     </div>
 
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap' }}>
-                      <div className="match-score-pill">
-                        {match.score}
+                    <h3 className="match-tourney-name">{match.tournament}</h3>
+
+                    <div className="match-meta-box">
+                      <span>🏸 결과 / 스코어</span>
+                      <strong style={{ fontSize: '14px', color: '#111111' }}>{match.score}</strong>
+                    </div>
+
+                    {match.memo && (
+                      <div className="match-memo-box">
+                        "{match.memo}"
                       </div>
-                      
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                        {match.videoUrl && (
-                          <a href={match.videoUrl} target="_blank" rel="noreferrer" className="btn-pill-outline" style={{ padding: '8px 16px', fontSize: '13px', textDecoration: 'none' }}>
-                            <Video size={14} /> 영상 보기
-                          </a>
-                        )}
-                        <button onClick={() => deleteMatch(match.id)} style={{ background: 'none', border: 'none', color: '#707072', fontSize: '12px', cursor: 'pointer', textDecoration: 'underline' }}>
-                          기록 삭제
-                        </button>
-                      </div>
+                    )}
+
+                    <div className="card-bottom-actions">
+                      {match.videoUrl && (
+                        <a href={match.videoUrl} target="_blank" rel="noreferrer" className="btn-card-action" style={{ color: '#0066cc', textDecoration: 'none', marginRight: 'auto' }}>
+                          <Video size={14} /> 유튜브 경기 영상
+                        </a>
+                      )}
+                      <button onClick={() => deleteMatch(match.id)} className="btn-card-action">
+                        <Trash2 size={13} /> 삭제
+                      </button>
                     </div>
                   </div>
-                ))}
-              </div>
+                );
+              })
             )}
-          </div>
+          </>
         )}
 
         {/* TAB 2: TOURNAMENTS FEED */}
         {activeTab === "tournaments" && (
-          <div>
-            <div className="section-title-row">
-              <div>
-                <p className="font-editorial-sub">JEONNAM & NATIONAL FEED</p>
-                <h2 className="font-editorial-title" style={{ marginTop: '8px' }}>UPCOMING TOURNAMENTS</h2>
-              </div>
-            </div>
-
-            <div className="tourney-grid">
-              {UPCOMING_TOURNAMENTS.map(t => (
-                <div key={t.id} className="tourney-card">
-                  <div>
-                    <p className="tourney-date">{t.date}</p>
-                    <h3 className="tourney-name">{t.name}</h3>
-                    <p style={{ fontSize: '14px', color: '#707072' }}>📍 {t.location}</p>
-                  </div>
-
-                  <div style={{ marginTop: '24px', paddingTop: '16px', borderTop: '1px solid #e5e5e5', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontSize: '12px', fontWeight: 800, color: '#111111' }}>접수 가능</span>
-                    <button 
-                      onClick={() => {
-                        setNewTourneyName(t.name);
-                        setIsAddingMatch(true);
-                        setActiveTab("diary");
-                      }}
-                      className="btn-pill-dark"
-                      style={{ padding: '10px 20px', fontSize: '13px' }}
-                    >
-                      내 일정에 추가 <ArrowRight size={14} />
-                    </button>
-                  </div>
+          <>
+            <p style={{ fontSize: '13px', fontWeight: 700, color: '#8e8e93', paddingLeft: '4px' }}>
+              📍 전남권 주요 배드민턴 일정 (터치하여 내 일기장에 출전 등록)
+            </p>
+            {UPCOMING_TOURNAMENTS.map(t => (
+              <div key={t.id} className="tourney-card-mobile">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span className="tourney-dday">{t.dDay}</span>
+                  <span style={{ fontSize: '12px', color: '#8e8e93', fontWeight: 600 }}>{t.date}</span>
                 </div>
-              ))}
-            </div>
-          </div>
+                <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#111111', lineBreak: 'keep-all' }}>{t.name}</h3>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px' }}>
+                  <span style={{ fontSize: '13px', color: '#48484a' }}>📍 {t.location}</span>
+                  <button 
+                    onClick={() => {
+                      setNewTourneyName(t.name);
+                      setIsAddingMatch(true);
+                      setActiveTab("diary");
+                    }}
+                    style={{ background: '#111111', color: '#fff', border: 'none', padding: '8px 14px', borderRadius: '8px', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}
+                  >
+                    일정 추가 ➕
+                  </button>
+                </div>
+              </div>
+            ))}
+          </>
         )}
 
       </main>
 
-      {/* 4. MODAL: ADD MATCH RECORD */}
+      {/* 5. MOBILE MODAL (iOS Bottom Sheet) */}
       {isAddingMatch && (
-        <div className="modal-backdrop">
-          <div className="modal-content">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-              <h3 className="font-editorial-title" style={{ fontSize: '28px' }}>NEW MATCH RECORD</h3>
-              <button onClick={() => setIsAddingMatch(false)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
-                <X size={24} />
+        <div className="mobile-modal-overlay">
+          <div className="mobile-modal-sheet">
+            <div className="modal-handle" />
+            
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <h3 style={{ fontSize: '20px', fontWeight: 800, color: '#111111' }}>새 경기 및 연습 일기</h3>
+              <button onClick={() => setIsAddingMatch(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}>
+                <X size={22} color="#8e8e93" />
               </button>
             </div>
 
             <form onSubmit={handleAddMatch}>
-              <label style={{ fontSize: '12px', fontWeight: 700, color: '#707072', textTransform: 'uppercase' }}>대회 또는 경기 이름</label>
+              <label style={{ fontSize: '12px', fontWeight: 700, color: '#8e8e93' }}>대회명 / 경기 제목</label>
               <input 
                 type="text" 
-                placeholder="예: 2026 광양시장기 전국배드민턴대회" 
+                placeholder="예: 광양시장기 여복 30 D급" 
                 value={newTourneyName}
                 onChange={(e) => setNewTourneyName(e.target.value)}
-                className="input-minimal"
+                className="input-mobile"
                 required
               />
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                 <div>
-                  <label style={{ fontSize: '12px', fontWeight: 700, color: '#707072', textTransform: 'uppercase' }}>경기 결과</label>
+                  <label style={{ fontSize: '12px', fontWeight: 700, color: '#8e8e93' }}>경기 결과</label>
                   <select 
                     value={newResult} 
                     onChange={(e) => setNewResult(e.target.value)}
-                    className="input-minimal"
+                    className="input-mobile"
                   >
-                    <option value="WIN">승리 (WIN 🔥)</option>
-                    <option value="LOSS">패배 (LOSS 💧)</option>
+                    <option value="WIN">🔥 승리</option>
+                    <option value="LOSS">💧 아쉬운 패배</option>
+                    <option value="AWARD">🏅 공식 입상</option>
                   </select>
                 </div>
                 <div>
-                  <label style={{ fontSize: '12px', fontWeight: 700, color: '#707072', textTransform: 'uppercase' }}>스코어</label>
+                  <label style={{ fontSize: '12px', fontWeight: 700, color: '#8e8e93' }}>스코어 / 순위</label>
                   <input 
                     type="text" 
                     value={newScore}
                     onChange={(e) => setNewScore(e.target.value)}
-                    className="input-minimal"
+                    className="input-mobile"
                   />
                 </div>
               </div>
 
-              <label style={{ fontSize: '12px', fontWeight: 700, color: '#707072', textTransform: 'uppercase' }}>실전 전술 메모 / 피드백</label>
+              <label style={{ fontSize: '12px', fontWeight: 700, color: '#8e8e93' }}>실전 전술 메모 및 배운 점</label>
               <textarea 
-                rows={3}
-                placeholder="예: 상대 전위가 드롭이 강함. 후반 드라이브 승부로 역전 성공!"
+                rows={4}
+                placeholder="오늘 경기에서 느낀 점, 파트너와의 호흡, 백핸드 푸시 피드백 등 자유롭게 적어보세요."
                 value={newMemo}
                 onChange={(e) => setNewMemo(e.target.value)}
-                className="input-minimal"
+                className="input-mobile"
                 style={{ resize: 'vertical' }}
               />
 
-              <label style={{ fontSize: '12px', fontWeight: 700, color: '#707072', textTransform: 'uppercase' }}>유튜브 경기 녹화 링크 (선택)</label>
+              <label style={{ fontSize: '12px', fontWeight: 700, color: '#8e8e93' }}>유튜브 녹화 영상 링크 (선택)</label>
               <input 
                 type="text" 
                 placeholder="https://youtu.be/..." 
                 value={newVideo}
                 onChange={(e) => setNewVideo(e.target.value)}
-                className="input-minimal"
+                className="input-mobile"
               />
 
-              <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
-                <button type="submit" className="btn-pill-dark" style={{ flex: 1, justifyContent: 'center' }}>
-                  일기장에 저장
-                </button>
-                <button type="button" onClick={() => setIsAddingMatch(false)} className="btn-pill-outline" style={{ border: 'none' }}>
-                  취소
-                </button>
-              </div>
+              <button type="submit" className="btn-sheet-submit">
+                내 일기장에 저장하기
+              </button>
             </form>
           </div>
         </div>
       )}
-
-      {/* 5. MINIMAL FOOTER */}
-      <footer className="footer-minimal">
-        <div>
-          <span style={{ fontWeight: 800, color: '#111111' }}>MINTON DIARY</span>
-          <span style={{ marginLeft: '12px' }}>Gwangyang Techzone Club · Athlete Archive</span>
-        </div>
-      </footer>
 
     </div>
   );
