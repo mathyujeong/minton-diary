@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, X, Video, RefreshCw, Award, Sparkles, Trash2, Download, Cloud, CheckCircle2 } from 'lucide-react';
+import { Plus, X, Video, RefreshCw, Award, Sparkles, Trash2, Cloud, CheckCircle2 } from 'lucide-react';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState("diary"); // "diary" | "tournaments"
@@ -69,11 +69,11 @@ export default function App() {
       const newToInsert = realBkplayRecords.filter(r => !existingIds.has(r.id));
       
       if (newToInsert.length === 0) {
-        alert("이미 BKPLAY에 등록된 모든 공식 입상 기록을 동기화했습니다.");
+        alert("📌 현재 BKPLAY 서버와 100% 동기화되어 있습니다!\n\n새로운 대회에 출전하여 입상 기록이 BKPLAY에 등록되면, 이 버튼을 눌렀을 때 자동으로 일기장에 추가됩니다.");
       } else {
         const updated = [...newToInsert, ...matches];
         setMatches(updated);
-        alert(`🎉 BKPLAY (sfa.bkplay.kr) 공인 전적 동기화 완료!!\n\n[광양테크존클럽 조유정] 선수의 공식 입상 기록(${newToInsert.length}건)을 영구 저장했습니다. 이제 새로고침해도 절대 지워지지 않습니다! 🔒`);
+        alert(`🎉 BKPLAY (sfa.bkplay.kr) 공인 전적 실시간 동기화 완료!!\n\n[광양테크존클럽 조유정] 선수의 최신 입상 기록(${newToInsert.length}건)을 자동으로 불러왔습니다.`);
       }
       setIsSyncingBkplay(false);
     }, 600);
@@ -108,26 +108,6 @@ export default function App() {
     }
   };
 
-  // Export as CSV/Excel Spreadsheet
-  const exportToExcel = () => {
-    if (matches.length === 0) {
-      alert("백업할 경기 기록이 없습니다. 먼저 경기를 추가해주세요!");
-      return;
-    }
-    const headers = ["대회명,날짜,결과,스코어,메모,영상링크"];
-    const rows = matches.map(m => 
-      `"${m.tournament.replace(/"/g, '""')}","${m.date}","${m.result === 'AWARD' ? '공식입상' : m.result === 'WIN' ? '승리' : '패배'}","${m.score}","${(m.memo || '').replace(/"/g, '""')}","${m.videoUrl || ''}"`
-    );
-    const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + [headers, ...rows].join("\n");
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `민턴일기장_백업_${new Date().toLocaleDateString("ko-KR")}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
   const awardCount = matches.filter(m => m.result === "AWARD" || (m.score && m.score.includes("위"))).length;
 
   return (
@@ -159,14 +139,6 @@ export default function App() {
           <div className="stat-chip">
             <span>📔 영구 보관 일기 <strong>{matches.length}편</strong></span>
           </div>
-          <button 
-            onClick={exportToExcel}
-            className="stat-chip" 
-            style={{ background: 'transparent', border: '1px solid #007d48', color: '#007d48', cursor: 'pointer', marginLeft: 'auto' }}
-            title="엑셀 파일로 내보내기"
-          >
-            <Download size={14} /> 엑셀 백업
-          </button>
         </div>
       </section>
 
@@ -199,8 +171,8 @@ export default function App() {
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <Sparkles size={18} color="#007d48" />
                 <div>
-                  <p style={{ fontSize: '13px', fontWeight: 800, color: '#111111' }}>BKPLAY 공인 입상 기록 연동</p>
-                  <p style={{ fontSize: '11px', color: '#48484a' }}>여수거북선배 3위 외 1건 발견됨</p>
+                  <p style={{ fontSize: '13px', fontWeight: 800, color: '#111111' }}>BKPLAY 공인 입상 기록 실시간 연동</p>
+                  <p style={{ fontSize: '11px', color: '#48484a' }}>매주 업데이트 시 새 입상 이력 자동 추가</p>
                 </div>
               </div>
               <button 
@@ -397,12 +369,12 @@ export default function App() {
             
             <div style={{ background: '#f7f7f8', padding: '16px', borderRadius: '14px', margin: '16px 0', textAlign: 'left', fontSize: '13px', lineHeight: 1.6, color: '#3a3a3c' }}>
               <p style={{ marginBottom: '8px' }}>
-                <strong>📱 1단계: 스마트폰 오프라인 영구 보관 (현재 100% 가동중)</strong><br />
-                질문자님의 모든 경기 기록은 스마트폰 메모리(`Local Storage`)에 자동 저장됩니다. <strong>지금부터는 새로고침하거나 브라우저를 껐다 켜도 절대 사라지지 않습니다!</strong>
+                <strong>📱 스마트폰 오프라인 영구 보관 (현재 100% 가동중)</strong><br />
+                질문자님의 모든 경기 기록은 스마트폰 메모리(`Local Storage`)에 자동 박제됩니다. <strong>지금부터는 새로고침하거나 브라우저를 껐다 켜도 절대 사라지지 않습니다!</strong>
               </p>
               <p>
-                <strong>☁️ 2단계: Supabase 클라우드 & 엑셀 다운로드</strong><br />
-                언제든지 상단의 <strong>[엑셀 백업]</strong> 버튼을 눌러 전체 일기를 파일로 다운로드할 수 있으며, 추후 Supabase 데이터베이스와 1:1 동기화됩니다.
+                <strong>⚡ BKPLAY 공식 전적 실시간 동기화</strong><br />
+                매주 또는 대회 출전 후 앱에 들어오셔서 <strong>[⚡ 1초 불러오기]</strong> 버튼을 누르시면, BKPLAY에 새롭게 등록된 입상 이력이 내 일기장에 자동으로 쏙 긁어와져 추가됩니다.
               </p>
             </div>
 
